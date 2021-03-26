@@ -27,15 +27,18 @@ import java.util.List;
 
 public class PostsFragment extends Fragment {
 
-    public static final String TAG = "PostsFragment";
-    private RecyclerView rvPosts;
-    protected PostsAdapter adapter;
-    protected List<Post> allPosts;
+     private RecyclerView rvPosts;
+     public static final String TAG="PostsFragment";
+     protected PostsAdapter adapter;
+     protected List<Post> allPosts;
     SwipeRefreshLayout swipeContainer;
+
+
 
     public PostsFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,56 +50,49 @@ public class PostsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rvPosts = view.findViewById(R.id.rvPosts);
-        swipeContainer = view.findViewById(R.id.swipeContainer);
 
+        swipeContainer = view.findViewById(R.id.swipeContainer);
         // Configure the refreshing colors
         swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Log.i(TAG,"Fetching new data!");
+                Log.i(TAG, "Retreiving data!");
                 queryPosts();
             }
         });
-
-        allPosts = new ArrayList<>();
-        adapter = new PostsAdapter(getContext(), allPosts);
-
-        // Steps to use Recyclerview:
-        // 0. create layout for one row in the list
-        // 1. create the adapter
-        // 2. create the data source
-        // 3. set the adapter on the recycler view
+        rvPosts=view.findViewById(R.id.rvPosts);
+        allPosts=new ArrayList<>();
+        adapter=new PostsAdapter(getContext(),allPosts);
         rvPosts.setAdapter(adapter);
-        // 4. set the layout manager on the recyclerview
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
         queryPosts();
     }
 
-    protected void queryPosts() {
+    protected void queryPosts(){
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.setLimit(20);
+        query.addDescendingOrder(Post.KEY_CREATED_AT);
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
-                if(e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting posts", e);
                     return;
                 }
-                for (Post post : posts){
-                    Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
+                for (Post post : posts) {
+                    //Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
                 }
-                adapter.clear();
-                adapter.addAll(posts);
-                // Now we call setRefreshing(false) to signal refresh has finished
-                swipeContainer.setRefreshing(false);
+                allPosts.addAll(posts);
+                adapter.notifyDataSetChanged();
             }
         });
+
     }
+
+
 }

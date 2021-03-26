@@ -38,6 +38,7 @@ import java.util.List;
 
 import fragments.ComposeFragment;
 import fragments.PostsFragment;
+import fragments.ProfileFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,8 +64,10 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.action_compose:
                         fragment=new ComposeFragment();
+
                         break;
                     case R.id.action_profile:
+                        fragment=new ProfileFragment();
 
                     default:
                         break;
